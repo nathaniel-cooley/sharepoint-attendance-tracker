@@ -38,9 +38,10 @@ The SharePoint Attendance Tracker automates the daily generation of attendance r
    - TransferType, TransferStatus
    - ApprovedBy, ApprovalDate, Reason
 
-### Azure Logic App Workflow
+### Azure Logic App Workflows
 
-The Logic App performs the following operations daily:
+#### Main Workflow (workflow.json)
+Runs daily at midnight UTC to generate attendance records with transfer-aware office assignments:
 
 1. **Initialize Variables**: Set up date and error tracking
 2. **Retrieve Active Employees**: Get all employees with "Active" status
@@ -49,6 +50,14 @@ The Logic App performs the following operations daily:
 5. **Create Attendance Records**: Generate daily records for all active employees
 6. **Handle Errors**: Log and report any failures
 7. **Update Expired Transfers**: Automatically complete past-due transfers
+
+#### Export-Reset Workflow (export-reset-workflow.json)
+Runs daily at 11 PM UTC for analytics integration and daily reset:
+
+1. **Export to Parquet**: Export day's attendance data to Parquet file for Databricks
+2. **Reset List**: Delete all attendance records from SharePoint
+3. **Create Fresh Records**: Generate new records for next day with primary office assignments
+4. **Enable Manager Workflow**: Allows managers to assign offices, secondary offices to mark attendance
 
 ## Quick Start
 
@@ -99,25 +108,52 @@ The Logic App performs the following operations daily:
 
 For detailed setup instructions, see [Setup Guide](docs/setup-guide.md).
 
+### Optional: Deploy Export-Reset Workflow
+
+For analytics integration (Databricks) with daily reset cycle:
+
+1. **Create SharePoint Document Library**:
+   - Name: `AttendanceExports`
+   - For storing daily Parquet exports
+
+2. **Deploy Export-Reset Logic App**:
+   ```powershell
+   cd scripts
+   .\setup-export-reset-workflow.ps1 `
+       -ResourceGroupName "rg-attendance-tracker" `
+       -Location "eastus" `
+       -LogicAppName "la-attendance-export-reset" `
+       -SharePointSiteUrl "https://yourtenant.sharepoint.com/sites/AttendanceTracking" `
+       -ExportFolderPath "/AttendanceExports"
+   ```
+
+3. **Authorize Connection** (same as main workflow)
+
+For detailed instructions, see [Export-Reset Guide](docs/export-reset-guide.md).
+
 ## Documentation
 
 - **[Setup Guide](docs/setup-guide.md)**: Comprehensive installation and configuration instructions
 - **[User Guide](docs/user-guide.md)**: Daily operations, managing employees, transfers, and reporting
+- **[Export-Reset Guide](docs/export-reset-guide.md)**: Analytics integration with daily export and reset cycle
 
 ## Project Structure
 
 ```
 sharepoint-attendance-tracker/
 ├── logic-app/
-│   └── workflow.json              # Azure Logic App workflow definition
+│   ├── workflow.json                    # Main workflow (transfer-aware)
+│   └── export-reset-workflow.json       # Export/reset workflow (analytics)
 ├── sharepoint/
 │   └── lists/
-│       └── schemas.json           # SharePoint list schemas
+│       └── schemas.json                 # SharePoint list schemas
 ├── scripts/
-│   └── setup-connection.ps1       # PowerShell deployment script
+│   ├── setup-connection.ps1             # Deploy main workflow
+│   └── setup-export-reset-workflow.ps1  # Deploy export-reset workflow
 ├── docs/
-│   ├── setup-guide.md             # Installation guide
-│   └── user-guide.md              # User documentation
+│   ├── setup-guide.md                   # Installation guide
+│   ├── user-guide.md                    # User documentation
+│   └── export-reset-guide.md            # Export-reset workflow guide
 ├── .gitignore
 └── README.md
 ```
@@ -153,6 +189,37 @@ graph TD
   - EndDate ≥ Current Date OR EndDate is null
 - **Assignment Priority**: Active transfers override primary office assignment
 - **Automatic Completion**: Transfers past their EndDate are marked as "Completed"
+
+## Workflow Comparison
+
+### Choose the Right Workflow for Your Needs
+
+| Feature | Main Workflow | Export-Reset Workflow |
+|---------|--------------|----------------------|
+| **Purpose** | Automatic transfer handling | Analytics integration with daily reset |
+| **Schedule** | Midnight (00:00 UTC) | Night (23:00 UTC) |
+| **Creates Records** | With transfer-aware assignments | With primary office only |
+| **Data Retention** | Keeps all historical records | Exports then deletes daily |
+| **Office Assignment** | Automatic based on transfers | Manual by managers |
+| **Best For** | Automated attendance tracking | Databricks/analytics pipelines |
+| **Export Format** | N/A | Parquet files |
+| **Reset Capability** | No | Yes - daily cleanup |
+
+**Use Main Workflow when:**
+- You want automatic office assignment based on transfers
+- You need historical data in SharePoint
+- Transfers are managed through the OfficeTransfers list
+
+**Use Export-Reset Workflow when:**
+- You need daily data export for analytics (Databricks)
+- Managers manually assign offices each day
+- You want a clean slate daily with primary office assignments
+- You need Parquet files for data lake/warehouse
+
+**Use Both Workflows when:**
+- You want both automatic and manual workflows
+- Run them at different times (e.g., main at 00:00, export-reset at 23:00)
+- Use separate SharePoint lists or sites
 
 ## Configuration
 
