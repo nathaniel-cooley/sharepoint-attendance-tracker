@@ -118,7 +118,11 @@ $workflowDefinition = Get-Content $workflowPath -Raw | ConvertFrom-Json
 
 # Update workflow parameters with SharePoint site URL
 Write-Host "Configuring workflow parameters..." -ForegroundColor Yellow
-$workflowDefinition.parameters.sharePointSiteUrl.defaultValue = $SharePointSiteUrl
+if ($workflowDefinition.parameters -and $workflowDefinition.parameters.sharePointSiteUrl) {
+    $workflowDefinition.parameters.sharePointSiteUrl.defaultValue = $SharePointSiteUrl
+} else {
+    Write-Host "Warning: Could not update SharePoint site URL in workflow definition" -ForegroundColor Yellow
+}
 
 # Get connection ID for the workflow
 $connectionId = "/subscriptions/$((Get-AzContext).Subscription.Id)/resourceGroups/$ResourceGroupName/providers/Microsoft.Web/connections/$connectionName"

@@ -2,7 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "SharePoint List Schemas for Attendance Tracking System"
+    "description": "SharePoint List Schemas for Attendance Tracking System",
+    "note": "This file provides schema definitions for manual SharePoint list creation. It is not an ARM template for automated deployment. Use these definitions as a reference when creating SharePoint lists manually via the SharePoint UI or PnP PowerShell."
   },
   "lists": {
     "EmployeeMaster": {

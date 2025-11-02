@@ -109,7 +109,7 @@
         "method": "get",
         "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('sharePointSiteUrl')))}/tables/@{encodeURIComponent(encodeURIComponent(parameters('officeTransfersListName')))}/items",
         "queries": {
-          "$filter": "TransferStatus eq 'Active' and StartDate le '@{variables('TodayDate')}' and (EndDate eq null or EndDate ge '@{variables('TodayDate')}')"
+          "$filter": "TransferStatus eq 'Active' and StartDate le datetime'@{variables('TodayDate')}' and (EndDate eq null or EndDate ge datetime'@{variables('TodayDate')}')"
         }
       },
       "runAfter": {
@@ -202,7 +202,7 @@
               {
                 "equals": [
                   "@outputs('Create_Attendance_Record')['statusCode']",
-                  200
+                  201
                 ]
               }
             ]
@@ -316,7 +316,7 @@
             "method": "get",
             "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('sharePointSiteUrl')))}/tables/@{encodeURIComponent(encodeURIComponent(parameters('officeTransfersListName')))}/items",
             "queries": {
-              "$filter": "TransferStatus eq 'Active' and EndDate lt '@{variables('TodayDate')}'"
+              "$filter": "TransferStatus eq 'Active' and EndDate lt datetime'@{variables('TodayDate')}'"
             }
           },
           "runAfter": {}
