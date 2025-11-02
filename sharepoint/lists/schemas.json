@@ -1,0 +1,273 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "SharePoint List Schemas for Attendance Tracking System",
+    "note": "This file provides schema definitions for manual SharePoint list creation. It is not an ARM template for automated deployment. Use these definitions as a reference when creating SharePoint lists manually via the SharePoint UI or PnP PowerShell."
+  },
+  "lists": {
+    "EmployeeMaster": {
+      "title": "Employee Master",
+      "description": "Master list containing employee details and primary office assignments",
+      "template": "GenericList",
+      "fields": [
+        {
+          "name": "EmployeeID",
+          "displayName": "Employee ID",
+          "type": "Text",
+          "required": true,
+          "indexed": true,
+          "unique": true,
+          "maxLength": 50
+        },
+        {
+          "name": "EmployeeName",
+          "displayName": "Employee Name",
+          "type": "Text",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "PrimaryOffice",
+          "displayName": "Primary Office",
+          "type": "Choice",
+          "required": true,
+          "choices": [
+            "Office A",
+            "Office B",
+            "Office C",
+            "Office D",
+            "Remote"
+          ]
+        },
+        {
+          "name": "CurrentStatus",
+          "displayName": "Current Status",
+          "type": "Choice",
+          "required": true,
+          "default": "Active",
+          "choices": [
+            "Active",
+            "Inactive",
+            "On Leave",
+            "Transferred"
+          ]
+        },
+        {
+          "name": "Department",
+          "displayName": "Department",
+          "type": "Text",
+          "required": false,
+          "maxLength": 100
+        },
+        {
+          "name": "EmailAddress",
+          "displayName": "Email Address",
+          "type": "Text",
+          "required": false,
+          "maxLength": 255
+        }
+      ]
+    },
+    "DailyAttendance": {
+      "title": "Daily Attendance",
+      "description": "Daily attendance tracking list (auto-generated daily)",
+      "template": "GenericList",
+      "fields": [
+        {
+          "name": "Date",
+          "displayName": "Date",
+          "type": "DateTime",
+          "required": true,
+          "indexed": true,
+          "dateFormat": "DateOnly"
+        },
+        {
+          "name": "EmployeeID",
+          "displayName": "Employee ID",
+          "type": "Text",
+          "required": true,
+          "indexed": true,
+          "maxLength": 50
+        },
+        {
+          "name": "EmployeeName",
+          "displayName": "Employee Name",
+          "type": "Text",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "AssignedOffice",
+          "displayName": "Assigned Office",
+          "type": "Choice",
+          "required": true,
+          "choices": [
+            "Office A",
+            "Office B",
+            "Office C",
+            "Office D",
+            "Remote"
+          ]
+        },
+        {
+          "name": "ActualOffice",
+          "displayName": "Actual Office",
+          "type": "Choice",
+          "required": false,
+          "choices": [
+            "Office A",
+            "Office B",
+            "Office C",
+            "Office D",
+            "Remote",
+            "Not Present"
+          ]
+        },
+        {
+          "name": "AttendanceStatus",
+          "displayName": "Attendance Status",
+          "type": "Choice",
+          "required": true,
+          "default": "Pending",
+          "choices": [
+            "Pending",
+            "Present",
+            "Absent",
+            "On Leave",
+            "Work From Home"
+          ]
+        },
+        {
+          "name": "RecordedBy",
+          "displayName": "Recorded By",
+          "type": "User",
+          "required": false
+        },
+        {
+          "name": "RecordedDateTime",
+          "displayName": "Recorded Date Time",
+          "type": "DateTime",
+          "required": false,
+          "dateFormat": "DateTime"
+        },
+        {
+          "name": "Notes",
+          "displayName": "Notes",
+          "type": "Note",
+          "required": false,
+          "numLines": 6
+        }
+      ]
+    },
+    "OfficeTransfers": {
+      "title": "Office Transfers",
+      "description": "Tracks temporary and permanent office assignments",
+      "template": "GenericList",
+      "fields": [
+        {
+          "name": "EmployeeID",
+          "displayName": "Employee ID",
+          "type": "Text",
+          "required": true,
+          "indexed": true,
+          "maxLength": 50
+        },
+        {
+          "name": "EmployeeName",
+          "displayName": "Employee Name",
+          "type": "Text",
+          "required": true,
+          "maxLength": 255
+        },
+        {
+          "name": "FromOffice",
+          "displayName": "From Office",
+          "type": "Choice",
+          "required": true,
+          "choices": [
+            "Office A",
+            "Office B",
+            "Office C",
+            "Office D",
+            "Remote"
+          ]
+        },
+        {
+          "name": "ToOffice",
+          "displayName": "To Office",
+          "type": "Choice",
+          "required": true,
+          "choices": [
+            "Office A",
+            "Office B",
+            "Office C",
+            "Office D",
+            "Remote"
+          ]
+        },
+        {
+          "name": "StartDate",
+          "displayName": "Start Date",
+          "type": "DateTime",
+          "required": true,
+          "indexed": true,
+          "dateFormat": "DateOnly"
+        },
+        {
+          "name": "EndDate",
+          "displayName": "End Date",
+          "type": "DateTime",
+          "required": false,
+          "dateFormat": "DateOnly"
+        },
+        {
+          "name": "TransferType",
+          "displayName": "Transfer Type",
+          "type": "Choice",
+          "required": true,
+          "default": "Temporary",
+          "choices": [
+            "Temporary",
+            "Permanent"
+          ]
+        },
+        {
+          "name": "TransferStatus",
+          "displayName": "Transfer Status",
+          "type": "Choice",
+          "required": true,
+          "default": "Pending",
+          "choices": [
+            "Pending",
+            "Approved",
+            "Rejected",
+            "Active",
+            "Completed",
+            "Cancelled"
+          ]
+        },
+        {
+          "name": "ApprovedBy",
+          "displayName": "Approved By",
+          "type": "User",
+          "required": false
+        },
+        {
+          "name": "ApprovalDate",
+          "displayName": "Approval Date",
+          "type": "DateTime",
+          "required": false,
+          "dateFormat": "DateTime"
+        },
+        {
+          "name": "Reason",
+          "displayName": "Reason",
+          "type": "Note",
+          "required": false,
+          "numLines": 6
+        }
+      ]
+    }
+  }
+}

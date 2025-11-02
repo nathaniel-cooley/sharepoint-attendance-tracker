@@ -1,0 +1,33 @@
+# Azure and PowerShell
+*.log
+*.tmp
+*.cache
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+/tmp/
+temp/
+
+# Build artifacts
+*.zip
+*.tar.gz
+
+# Sensitive information
+*.secrets
+*.credentials
+local.settings.json
